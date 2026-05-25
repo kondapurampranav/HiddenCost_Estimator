@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BuildTrue V2 — Material Upgrade Estimator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HOME PAGE ═══════════════════════════ -->
+<div id="page-home" class="page active">
+  <div class="hero-eyebrow">🏗 MATERIAL UPGRADE COST ESTIMATOR — V2</div>
+
+  <h1 class="hero">
+    KNOW YOUR<br><span>UPGRADE</span><br>COST UPFRONT
+  </h1>
+
+  <p class="hero-sub">
+    Compare your builder's package allowances against the materials you actually want —
+    and find out exactly how much extra you'll need to pay, category by category.
+  </p>
+
+  <!-- House dimension inputs right on hero -->
+  <div class="hero-inputs">
+    <div class="hero-inputs-title">📐 Enter House Dimensions</div>
+    <div class="grid-2" style="gap:16px">
+      <div class="field">
+        <label>Length (ft)</label>
+        <input type="number" id="h-length" placeholder="e.g. 40" min="0" oninput="calcHomeArea()"/>
+      </div>
+      <div class="field">
+        <label>Breadth (ft)</label>
+        <input type="number" id="h-breadth" placeholder="e.g. 30" min="0" oninput="calcHomeArea()"/>
+      </div>
+      <div class="field">
+        <label>Number of Floors</label>
+        <input type="number" id="h-floors" placeholder="e.g. 1" min="1" value="1" oninput="calcHomeArea()"/>
+      </div>
+      <div class="field">
+        <label>Total House Area (computed)</label>
+        <input type="text" id="h-area-display" class="computed" readonly placeholder="—"/>
+      </div>
+    </div>
+
+    <div id="home-area-result" class="home-result-row hidden">
+
+  <div class="home-result">
+    <div class="home-result-label">TOTAL HOUSE AREA</div>
+    <div class="home-result-value" id="home-area-val">—</div>
+    <div class="home-result-sub" id="home-area-sub">sq.ft · All modules will use this value</div>
+  </div>
+
+  <div class="home-result home-result--teal">
+    <div class="home-result-label">BUILDER PACKAGE COST</div>
+    <div class="home-result-value" id="home-builder-val">—</div>
+    <div class="home-result-sub">@ ₹2,350 / sq.ft (standard builder rate)</div>
+  </div>
+
+</div>
+  </div>
+
+  <div class="hero-steps">
+    <div class="hero-step"><div class="hero-step-num">01</div><div class="hero-step-label">Enter House Dimensions</div></div>
+    <div class="hero-step"><div class="hero-step-num">02</div><div class="hero-step-label">Configure 5 Material Modules</div></div>
+    <div class="hero-step"><div class="hero-step-num">03</div><div class="hero-step-label">View Upgrade Cost Dashboard</div></div>
+  </div>
+
+  <button class="cta-btn" id="cta-start" onclick="startApp()" disabled>
+    START UPGRADE ANALYSIS →
+  </button>
+</div>
+
+<!-- ═══════════════════════════ APP SHELL ═══════════════════════════ -->
+<div id="app-shell" class="hidden">
+  <nav>
+    <div class="nav-logo">BUILDTRUE <span>V2</span></div>
+    <button class="nav-tab active" data-page="tiles"     onclick="switchPage('tiles',this)">🪟 Tiles</button>
+    <button class="nav-tab"        data-page="kitchen"   onclick="switchPage('kitchen',this)">🍳 Kitchen</button>
+    <button class="nav-tab"        data-page="bathroom"  onclick="switchPage('bathroom',this)">🚿 Bathroom</button>
+    <button class="nav-tab"        data-page="doors"     onclick="switchPage('doors',this)">🚪 Doors &amp; Windows</button>
+    <button class="nav-tab"        data-page="accessories" onclick="switchPage('accessories',this)">🔩 Accessories</button>
+    <button class="nav-tab"        data-page="dashboard" onclick="switchPage('dashboard',this)">📊 Dashboard</button>
+    <button class="nav-tab nav-home" onclick="goHome()">← Home</button>
+  </nav>
+
+  <!-- ─────────────────── TILES PAGE ─────────────────── -->
+  <div id="page-tiles" class="page active">
+    <div class="inner animate-in">
+      <div class="page-title">TILES &amp; <span>FLOORING</span></div>
+      <p class="page-sub">Compare your selected flooring materials against builder allowances to find your upgrade cost.</p>
+
+      <div class="section-gap">
+
+        <!-- Area Inputs -->
+        <div class="card">
+          <div class="card-title">📐 Area Breakdown</div>
+          <div class="card-sub">Enter kitchen and balcony areas — remaining area auto-assigned to Hall + Rooms.</div>
+          <div class="grid-3" style="gap:16px">
+            <div class="field">
+              <label>Kitchen Area (sq.ft)</label>
+              <input type="number" id="t-kitchen-area" placeholder="e.g. 80" min="0" oninput="calcTiles()"/>
+            </div>
+            <div class="field">
+              <label>Balcony Area (sq.ft)</label>
+              <input type="number" id="t-balcony-area" placeholder="e.g. 40" min="0" oninput="calcTiles()"/>
+            </div>
+            <div class="field">
+              <label>Number of Bathrooms</label>
+              <input type="number" id="t-baths" placeholder="e.g. 2" min="0" oninput="calcTiles()"/>
+            </div>
+          </div>
+
+          <!-- Computed area display -->
+          <div class="grid-3" style="gap:16px; margin-top:20px">
+            <div class="stat-box teal" style="padding:18px 20px">
+              <div class="stat-label">Bathroom Area (auto)</div>
+              <div class="stat-val" id="t-bath-area-val" style="font-size:24px">—</div>
+              <div class="stat-sub">bathrooms × 60 sq.ft</div>
+            </div>
+            <div class="stat-box indigo" style="padding:18px 20px">
+              <div class="stat-label">Hall + Room Area (auto)</div>
+              <div class="stat-val" id="t-hall-area-val" style="font-size:24px">—</div>
+              <div class="stat-sub">total − kitchen − balcony − bath</div>
+            </div>
+            <div class="stat-box" style="padding:18px 20px">
+              <div class="stat-label">Total House Area</div>
+              <div class="stat-val" id="t-total-area-val" style="font-size:24px">—</div>
+              <div class="stat-sub">from home page</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hall + Room Flooring -->
+        <div class="card">
+          <div class="card-title">🛋 Hall + Room Flooring</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹125 / sq.ft</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Material Type</label>
+              <select id="t-hall-type" onchange="calcTiles()">
+                <option value="Tiles">Tiles</option>
+                <option value="Granite">Granite</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Selected Price (₹/sq.ft)</label>
+              <input type="number" id="t-hall-price" placeholder="e.g. 180" min="0" oninput="calcTiles()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="hall-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Kitchen Flooring -->
+        <div class="card">
+          <div class="card-title">🍳 Kitchen Flooring</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹125 / sq.ft</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Material Type</label>
+              <select id="t-kitchen-type" onchange="calcTiles()">
+                <option value="Tiles">Tiles</option>
+                <option value="Granite">Granite</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Selected Price (₹/sq.ft)</label>
+              <input type="number" id="t-kitchen-price" placeholder="e.g. 150" min="0" oninput="calcTiles()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="kitchen-floor-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Balcony Flooring -->
+        <div class="card">
+          <div class="card-title">🌿 Balcony Flooring</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹60 / sq.ft</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Material Type</label>
+              <select id="t-balcony-type" onchange="calcTiles()">
+                <option value="Tiles">Tiles</option>
+                <option value="Granite">Granite</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Selected Price (₹/sq.ft)</label>
+              <input type="number" id="t-balcony-price" placeholder="e.g. 90" min="0" oninput="calcTiles()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="balcony-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Bathroom Wall Tiles -->
+        <div class="card">
+          <div class="card-title">🚿 Bathroom Wall Tiles</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹60 / sq.ft</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Selected Tile Price (₹/sq.ft)</label>
+              <input type="number" id="t-bath-price" placeholder="e.g. 85" min="0" oninput="calcTiles()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="bath-tile-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Tiles Total -->
+        <div class="result-box" id="tiles-total-box">
+          <div class="result-label">TOTAL TILE UPGRADE COST</div>
+          <div class="result-value" id="tiles-total-val">₹0</div>
+          <div class="result-detail">Additional amount above builder package allowances for all flooring</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────── KITCHEN PAGE ─────────────────── -->
+  <div id="page-kitchen" class="page hidden">
+    <div class="inner animate-in">
+      <div class="page-title">KITCHEN <span>UPGRADES</span></div>
+      <p class="page-sub">Compare your selected kitchen fittings against the builder package to find your upgrade cost.</p>
+
+      <div class="section-gap">
+
+        <!-- Countertop -->
+        <div class="card">
+          <div class="card-title">🪨 Countertop</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹180 / sq.ft</span>
+          <div class="grid-3" style="gap:16px">
+            <div class="field">
+              <label>Material Type</label>
+              <select id="k-counter-type" onchange="calcKitchen()">
+                <option value="Quartz">Quartz</option>
+                <option value="Granite">Granite</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Countertop Area (sq.ft)</label>
+              <input type="number" id="k-counter-area" placeholder="e.g. 20" min="0" oninput="calcKitchen()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price (₹/sq.ft)</label>
+              <input type="number" id="k-counter-price" placeholder="e.g. 250" min="0" oninput="calcKitchen()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="counter-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Kitchen Sink -->
+        <div class="card">
+          <div class="card-title">🚰 Kitchen Sink</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹7,000</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Selected Sink Cost (₹)</label>
+              <input type="number" id="k-sink-cost" placeholder="e.g. 12000" min="0" oninput="calcKitchen()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="sink-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Utility Sink & Faucet -->
+        <div class="card">
+          <div class="card-title">🔧 Utility Sink &amp; Faucet</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹3,000</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Selected Utility Sink &amp; Faucet Cost (₹)</label>
+              <input type="number" id="k-utility-cost" placeholder="e.g. 5000" min="0" oninput="calcKitchen()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="utility-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Kitchen Total -->
+        <div class="result-box">
+          <div class="result-label">TOTAL KITCHEN UPGRADE COST</div>
+          <div class="result-value" id="kitchen-total-val">₹0</div>
+          <div class="result-detail">Additional amount above builder package allowances for kitchen fittings</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────── BATHROOM PAGE ─────────────────── -->
+  <div id="page-bathroom" class="page hidden">
+    <div class="inner animate-in">
+      <div class="page-title">BATHROOM <span>UPGRADES</span></div>
+      <p class="page-sub">Enter your selected bathroom fixture costs to see the upgrade above builder allowances.</p>
+
+      <div class="section-gap">
+
+        <div class="card">
+          <div class="card-title">🚽 Commode</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹8,000 per unit</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Number of Commodes</label>
+              <input type="number" id="b-commode-qty" placeholder="e.g. 2" min="0" oninput="calcBathroom()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price per Unit (₹)</label>
+              <input type="number" id="b-commode-price" placeholder="e.g. 14000" min="0" oninput="calcBathroom()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="commode-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🪥 Wash Basin</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹3,500 per unit</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Number of Wash Basins</label>
+              <input type="number" id="b-basin-qty" placeholder="e.g. 2" min="0" oninput="calcBathroom()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price per Unit (₹)</label>
+              <input type="number" id="b-basin-price" placeholder="e.g. 6000" min="0" oninput="calcBathroom()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="basin-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🚿 Shower</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹4,000 per unit</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Number of Showers</label>
+              <input type="number" id="b-shower-qty" placeholder="e.g. 2" min="0" oninput="calcBathroom()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price per Unit (₹)</label>
+              <input type="number" id="b-shower-price" placeholder="e.g. 8000" min="0" oninput="calcBathroom()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="shower-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🔩 Faucets &amp; Taps</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹1,500 per unit</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Number of Faucets</label>
+              <input type="number" id="b-faucet-qty" placeholder="e.g. 4" min="0" oninput="calcBathroom()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price per Unit (₹)</label>
+              <input type="number" id="b-faucet-price" placeholder="e.g. 3000" min="0" oninput="calcBathroom()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="faucet-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Bathroom Total -->
+        <div class="result-box">
+          <div class="result-label">TOTAL BATHROOM UPGRADE COST</div>
+          <div class="result-value" id="bathroom-total-val">₹0</div>
+          <div class="result-detail">Additional amount above builder package for all bathroom fixtures</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────── DOORS & WINDOWS PAGE ─────────────────── -->
+  <div id="page-doors" class="page hidden">
+    <div class="inner animate-in">
+      <div class="page-title">DOORS &amp; <span>WINDOWS</span></div>
+      <p class="page-sub">Enter your selected door and window costs to calculate the upgrade above builder allowances.</p>
+
+      <div class="section-gap">
+
+        <div class="card">
+          <div class="card-title">🚪 Main Door</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹25,000 per unit</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Number of Main Doors</label>
+              <input type="number" id="d-main-qty" placeholder="e.g. 1" min="0" oninput="calcDoors()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price per Unit (₹)</label>
+              <input type="number" id="d-main-price" placeholder="e.g. 45000" min="0" oninput="calcDoors()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="main-door-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🚪 Internal Doors</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹8,000 per unit</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Number of Internal Doors</label>
+              <input type="number" id="d-internal-qty" placeholder="e.g. 4" min="0" oninput="calcDoors()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price per Unit (₹)</label>
+              <input type="number" id="d-internal-price" placeholder="e.g. 12000" min="0" oninput="calcDoors()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="internal-door-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🪟 Windows</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹6,000 per unit</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Number of Windows</label>
+              <input type="number" id="d-window-qty" placeholder="e.g. 6" min="0" oninput="calcDoors()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price per Unit (₹)</label>
+              <input type="number" id="d-window-price" placeholder="e.g. 10000" min="0" oninput="calcDoors()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="window-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Doors Total -->
+        <div class="result-box">
+          <div class="result-label">TOTAL DOORS &amp; WINDOWS UPGRADE COST</div>
+          <div class="result-value" id="doors-total-val">₹0</div>
+          <div class="result-detail">Additional amount above builder package for doors and windows</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────── ACCESSORIES PAGE ─────────────────── -->
+  <div id="page-accessories" class="page hidden">
+    <div class="inner animate-in">
+      <div class="page-title">ACCESSORIES &amp; <span>HARDWARE</span></div>
+      <p class="page-sub">Enter your selected accessory costs to calculate the upgrade above builder allowances.</p>
+
+      <div class="section-gap">
+
+        <div class="card">
+          <div class="card-title">🔑 Door Handles</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹500 per unit</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Number of Handles</label>
+              <input type="number" id="a-handle-qty" placeholder="e.g. 8" min="0" oninput="calcAccessories()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price per Unit (₹)</label>
+              <input type="number" id="a-handle-price" placeholder="e.g. 1200" min="0" oninput="calcAccessories()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="handle-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🔒 Door Locks</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹1,200 per unit</span>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Number of Locks</label>
+              <input type="number" id="a-lock-qty" placeholder="e.g. 3" min="0" oninput="calcAccessories()"/>
+            </div>
+            <div class="field">
+              <label>Selected Price per Unit (₹)</label>
+              <input type="number" id="a-lock-price" placeholder="e.g. 3500" min="0" oninput="calcAccessories()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="lock-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">✨ Other Accessories</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹0 (not included in package)</span>
+          <div class="card-sub">Towel rails, hooks, hinges, cabinet handles, etc.</div>
+          <div class="grid-2" style="gap:16px">
+            <div class="field">
+              <label>Total Accessories Cost (₹)</label>
+              <input type="number" id="a-other-cost" placeholder="e.g. 5000" min="0" oninput="calcAccessories()"/>
+            </div>
+            <div class="field">
+              <label>Description (optional)</label>
+              <input type="text" id="a-other-desc" placeholder="e.g. Towel rails, hooks…" oninput="calcAccessories()"/>
+            </div>
+          </div>
+          <div class="breakdown" id="other-acc-breakdown" style="margin-top:18px"></div>
+        </div>
+
+        <!-- Accessories Total -->
+        <div class="result-box">
+          <div class="result-label">TOTAL ACCESSORIES COST</div>
+          <div class="result-value" id="accessories-total-val">₹0</div>
+          <div class="result-detail">Additional amount for accessories above builder package</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────── DASHBOARD PAGE ─────────────────── -->
+  <div id="page-dashboard" class="page hidden">
+    <div class="inner animate-in">
+      <div class="page-title">UPGRADE COST <span>DASHBOARD</span></div>
+      <p class="page-sub">Complete breakdown of your material upgrade costs across all categories.</p>
+
+      <div id="dash-empty" class="alert-banner hidden">
+        ⚠ Please enter your house dimensions on the <strong>Home</strong> page first, then fill in the module details.
+      </div>
+
+      <div id="dash-content" class="section-gap">
+
+        <!-- KPI boxes — 3 on top row -->
+        <div class="grid-3" style="gap:16px">
+          <div class="stat-box teal">
+            <div class="stat-label">Builder Package Value</div>
+            <div class="stat-val" id="d-allowance">—</div>
+            <div class="stat-sub">Total builder allowances across all categories</div>
+          </div>
+          <div class="stat-box orange">
+            <div class="stat-label">Total Upgrade Cost</div>
+            <div class="stat-val" id="d-upgrade">—</div>
+            <div class="stat-sub">Extra you pay above the builder package</div>
+          </div>
+          <div class="stat-box gold">
+            <div class="stat-label">Your Selected Total</div>
+            <div class="stat-val" id="d-selected">—</div>
+            <div class="stat-sub" id="d-pct">—</div>
+          </div>
+        </div>
+
+        <!-- per-category stat boxes -->
+        <div class="grid-3" style="gap:16px" id="d-cat-boxes"></div>
+
+        <!-- Summary breakdown -->
+        <div class="card">
+          <div class="card-title">Category-wise Upgrade Summary</div>
+          <div class="breakdown" id="d-summary"></div>
+
+          <div style="margin-top:28px" id="d-progress"></div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid-2-charts" style="gap:20px">
+          <div class="chart-box">
+            <div class="chart-title">UPGRADE COST DISTRIBUTION</div>
+            <canvas id="chart-pie"></canvas>
+          </div>
+          <div class="chart-box">
+            <div class="chart-title">BUILDER ALLOWANCE VS YOUR SELECTION</div>
+            <canvas id="chart-compare"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-title">ALLOWANCE VS UPGRADE — BY CATEGORY</div>
+          <canvas id="chart-bar"></canvas>
+        </div>
+
+        <!-- Insight -->
+        <div class="insight-box">
+          <h3>⚡ UPGRADE SUMMARY</h3>
+          <p id="d-insight">—</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#app-shell -->
+
+</body>
+</html>
