@@ -535,3 +535,92 @@ window.addEventListener('DOMContentLoaded', () => {
   calcDoors();
   calcAccessories();
 });
+
+function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // ===== DATA =====
+    const today = new Date().toLocaleDateString("en-IN");
+    const builderRate = 2350; // change if needed
+    const packageCost = TOTAL_AREA * builderRate;
+    const tilesCost = TILE_TOTAL;
+    const kitchenCost = KITCHEN_TOTAL;
+    const bathroomCost = BATHROOM_TOTAL;
+    const doorsCost = DOORS_TOTAL;
+    const accessoriesCost = ACC_TOTAL;
+
+    const totalUpgrade =
+        tilesCost +
+        kitchenCost +
+        bathroomCost +
+        doorsCost +
+        accessoriesCost;
+    const finalCost = packageCost + totalUpgrade;
+
+    // ===== PDF DESIGN =====
+    let y = 20;
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text("BUILDTRUE", 20, y);
+    y += 10;
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text("Construction Material Upgrade Report", 20, y);
+    y += 10;
+    doc.text(`Date: ${today}`, 20, y);
+    y += 10;
+    doc.line(20, y, 190, y);
+
+    // ===== HOUSE DETAILS =====
+    y += 10;
+    doc.setFont("helvetica", "bold");
+    doc.text("HOUSE DETAILS", 20, y);
+    y += 10;
+    doc.setFont("helvetica", "normal");
+    doc.text(`Area`, 20, y);
+    doc.text(`${TOTAL_AREA} sq.ft`, 120, y);
+    y += 8;
+    doc.text(`Builder Rate`, 20, y);
+    doc.text(`Rs.${builderRate}/sq.ft`, 120, y);
+    y += 8;
+    doc.text(`Package Cost`, 20, y);
+    doc.text(`Rs.${packageCost.toLocaleString("en-IN")}`, 120, y);
+    y += 10;
+    doc.line(20, y, 190, y);
+
+    // ===== UPGRADE SUMMARY =====
+    y += 10;
+    doc.setFont("helvetica", "bold");
+    doc.text("UPGRADE SUMMARY", 20, y);
+    y += 10;
+    doc.setFont("helvetica", "normal");
+    doc.text("Tiles", 20, y);
+    doc.text(`Rs.${tilesCost.toLocaleString("en-IN")}`, 120, y);
+    y += 8;
+    doc.text("Kitchen", 20, y);
+    doc.text(`Rs.${kitchenCost.toLocaleString("en-IN")}`, 120, y);
+    y += 8;
+    doc.text("Bathroom", 20, y);
+    doc.text(`Rs.${bathroomCost.toLocaleString("en-IN")}`, 120, y);
+    y += 8;
+    doc.text("Doors", 20, y);
+    doc.text(`Rs.${doorsCost.toLocaleString("en-IN")}`, 120, y);
+    y += 8;
+    doc.text("Accessories", 20, y);
+    doc.text(`Rs.${accessoriesCost.toLocaleString("en-IN")}`, 120, y);
+    y += 10;
+    doc.line(20, y, 190, y);
+    // ===== FINAL TOTALS =====
+    y += 10;
+    doc.setFont("helvetica", "bold");
+    doc.text("TOTAL UPGRADE", 20, y);
+    doc.text(`Rs.${totalUpgrade.toLocaleString("en-IN")}`, 120, y);
+    y += 10;
+    doc.text("FINAL COST", 20, y);
+    doc.text(`Rs.${finalCost.toLocaleString("en-IN")}`, 120, y);
+    y += 10;
+    doc.line(20, y, 190, y);
+    // ===== SAVE =====
+    doc.save("BuildTrue_Estimate_Report.pdf");
+}

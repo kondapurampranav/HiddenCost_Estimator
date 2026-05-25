@@ -433,3 +433,18 @@ nav {
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-in { animation: fadeUp .45s ease both; }
+
+.pdf-btn{
+  margin-top:25px;
+  padding:14px 25px;
+  background:#E8A838;
+  color:#000;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:15px;
+}
+.pdf-btn:hover{
+  opacity:0.9;
+}
