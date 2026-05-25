@@ -121,7 +121,7 @@ function calcHomeArea() {
 // MODULE 1 — TILES
 // ──────────────────────────────────────────────────────────────────
 // Allowances
-const ALLOW_HALL     = 125;
+const ALLOW_HALL = 125;
 const ALLOW_HALL_GRANITE = 180;
 const ALLOW_KITCHEN  = 125;
 const ALLOW_KITCHEN_GRANITE = 180;
@@ -153,7 +153,7 @@ const hallExtra = clamp0(hallPrice - hallAllow) * hallArea;
   el('hall-breakdown').innerHTML =
     brow(`Area used`, hallArea, 'allowance', 'sqft') +
     brow(`Builder allowance (₹${hallAllow}/sq.ft × ${fmtN(hallArea)} sq.ft)`, hallAllow * hallArea, 'allowance') +
-    (hallPrice > 0 ? brow(`Your ${hallType} (₹${hallPrice}/sq.ft × ${fmtN(hallArea)} sq.ft)`, hallPrice * hallArea, '') : '') +
+    (hallPrice > 0 ? brow(`Your ${hallType} (₹${hallAllow}/sq.ft × ${fmtN(hallArea)} sq.ft)`, hallAllow * hallArea, '') : '') +
     (hallPrice > 0 ? brow('Hall + Room Additional Cost', hallExtra, hallExtra > 0 ? 'upgrade' : 'zero') : '');
 
   // ── Kitchen Flooring ──
@@ -164,17 +164,18 @@ const hallExtra = clamp0(hallPrice - hallAllow) * hallArea;
   el('kitchen-floor-breakdown').innerHTML =
     brow('Area used:', kitchenArea, 'allowance', 'sqft') +
     brow(`Builder allowance (₹${kitchenAllow}/sq.ft × ${fmtN(kitchenArea)} sq.ft)`, kitchenAllow * kitchenArea, 'allowance') +
-    (kitchenPrice > 0 ? brow(`Your ${kitchenType} (₹${kitchenPrice}/sq.ft × ${fmtN(kitchenArea)} sq.ft)`, kitchenPrice * kitchenArea, '') : '') +
+    (kitchenPrice > 0 ? brow(`Your ${kitchenType} (₹${kitchenAllow}/sq.ft × ${fmtN(kitchenArea)} sq.ft)`, kitchenAllow * kitchenArea, '') : '') +
     (kitchenPrice > 0 ? brow('Kitchen Additional Cost', kitchenExtra, kitchenExtra > 0 ? 'upgrade' : 'zero') : '');
 
   // ── Balcony ──
   const balconyPrice = nv('t-balcony-price');
   const balconyType  = sv('t-balcony-type', 'Tiles');
+  const balconyAllow = balconyType === 'Granite' ? ALLOW_BALCONY_GRANITE : ALLOW_BALCONY;
   const balconyExtra = clamp0(balconyPrice - ALLOW_BALCONY) * balconyArea;
   el('balcony-breakdown').innerHTML =
     brow('Area used:', balconyArea, 'allowance', 'sqft') +
-    brow(`Builder allowance (₹${ALLOW_BALCONY}/sq.ft × ${fmtN(balconyArea)} sq.ft)`, ALLOW_BALCONY * balconyArea, 'allowance') +
-    (balconyPrice > 0 ? brow(`Your ${balconyType} (₹${balconyPrice}/sq.ft × ${fmtN(balconyArea)} sq.ft)`, balconyPrice * balconyArea, '') : '') +
+    brow(`Builder allowance (₹${balconyAllow}/sq.ft × ${fmtN(balconyArea)} sq.ft)`, balconyAllow * balconyArea, 'allowance') +
+    (balconyPrice > 0 ? brow(`Your ${balconyType} (₹${balconyAllow}/sq.ft × ${fmtN(balconyArea)} sq.ft)`, balconyAllow * balconyArea, '') : '') +
     (balconyPrice > 0 ? brow('Balcony Additional Cost', balconyExtra, balconyExtra > 0 ? 'upgrade' : 'zero') : '');
 
   // ── Bathroom Wall Tiles ──
