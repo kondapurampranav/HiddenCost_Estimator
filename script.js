@@ -194,7 +194,8 @@ const hallExtra = clamp0(hallPrice - hallAllow) * hallArea;
 // ──────────────────────────────────────────────────────────────────
 // MODULE 2 — KITCHEN
 // ──────────────────────────────────────────────────────────────────
-const ALLOW_COUNTER = 180;
+const ALLOW_COUNTER = 150;
+const ALLOW_COUNTER_GRANITE = 180;
 const ALLOW_SINK    = 7000;
 const ALLOW_UTILITY = 3000;
 
@@ -205,9 +206,10 @@ function calcKitchen() {
   const cArea  = nv('k-counter-area');
   const cPrice = nv('k-counter-price');
   const cType  = sv('k-counter-type', 'Quartz');
-  const cExtra = clamp0(cPrice - ALLOW_COUNTER) * cArea;
+  const cAllow = cType === 'Granite' ? ALLOW_COUNTER_GRANITE : ALLOW_COUNTER;
+  const cExtra = clamp0(cPrice - cAllow) * cArea;
   el('counter-breakdown').innerHTML =
-    brow(`Builder allowance (₹${ALLOW_COUNTER}/sq.ft × ${fmtN(cArea)} sq.ft)`, ALLOW_COUNTER * cArea, 'allowance') +
+    brow(`Builder allowance (₹${cAllow}/sq.ft × ${fmtN(cArea)} sq.ft)`, cAllow * cArea, 'allowance') +
     (cPrice > 0 ? brow(`Your ${cType} countertop (₹${cPrice}/sq.ft × ${fmtN(cArea)} sq.ft)`, cPrice * cArea, '') : '') +
     (cPrice > 0 ? brow('Countertop Additional Cost', cExtra, cExtra > 0 ? 'upgrade' : 'zero') : '');
 
