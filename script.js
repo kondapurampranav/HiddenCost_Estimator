@@ -122,11 +122,10 @@ function calcHomeArea() {
 // ──────────────────────────────────────────────────────────────────
 // Allowances
 const ALLOW_HALL = 125;
-const ALLOW_HALL_GRANITE = 180;
+const ALLOW_HALL_GRANITE = 125;
 const ALLOW_KITCHEN  = 125;
-const ALLOW_KITCHEN_GRANITE = 180;
+const ALLOW_KITCHEN_GRANITE = 125;
 const ALLOW_BALCONY  = 60;
-const ALLOW_BALCONY_GRANITE = 100;
 const ALLOW_BATH_WAL = 60;
 const BATH_AREA_PER  = 60; // sq.ft per bathroom
 
@@ -170,11 +169,10 @@ const hallExtra = clamp0(hallPrice - hallAllow) * hallArea;
   // ── Balcony ──
   const balconyPrice = nv('t-balcony-price');
   const balconyType  = sv('t-balcony-type', 'Tiles');
-  const balconyAllow = balconyType === 'Granite' ? ALLOW_BALCONY_GRANITE : ALLOW_BALCONY;
-  const balconyExtra = clamp0(balconyPrice - balconyAllow) * balconyArea;
+  const balconyExtra = clamp0(balconyPrice - ALLOW_BALCONY) * balconyArea;
   el('balcony-breakdown').innerHTML =
     brow('Area used:', balconyArea, 'allowance', 'sqft') +
-    brow(`Builder allowance (₹${balconyAllow}/sq.ft × ${fmtN(balconyArea)} sq.ft)`, balconyAllow * balconyArea, 'allowance') +
+    brow(`Builder allowance (₹${ALLOW_BALCONY}/sq.ft × ${fmtN(balconyArea)} sq.ft)`, ALLOW_BALCONY * balconyArea, 'allowance') +
     (balconyPrice > 0 ? brow(`Your ${balconyType} (₹${balconyPrice}/sq.ft × ${fmtN(balconyArea)} sq.ft)`, balconyPrice * balconyArea, '') : '') +
     (balconyPrice > 0 ? brow('Balcony Additional Cost', balconyExtra, balconyExtra > 0 ? 'upgrade' : 'zero') : '');
 
@@ -237,9 +235,9 @@ function calcKitchen() {
 // MODULE 3 — BATHROOM
 // ──────────────────────────────────────────────────────────────────
 const ALLOW_COMMODE = 8000;
-const ALLOW_BASIN   = 3500;
+const ALLOW_BASIN   = 2000;
 const ALLOW_SHOWER  = 4000;
-const ALLOW_FAUCET  = 1500;
+const ALLOW_FAUCET  = 1200;
 
 let BATHROOM_TOTAL = 0;
 
@@ -254,17 +252,43 @@ function calcBathroom() {
     return extra;
   }
 
-  const qCommode = nv('b-commode-qty'); const pCommode = nv('b-commode-price');
-  const qBasin   = nv('b-basin-qty');   const pBasin   = nv('b-basin-price');
-  const qShower  = nv('b-shower-qty');  const pShower  = nv('b-shower-price');
-  const qFaucet  = nv('b-faucet-qty');  const pFaucet  = nv('b-faucet-price');
+  const numBaths = nv('t-baths');
+  const qBasin = numBaths;  const pBasin = nv('b-basin-price');
+  const qFaucetPer   = nv('b-faucet-qty');
+  const totalFaucets = qFaucetPer * numBaths;
+  const builderTaps  = 2 * numBaths;
+  const pFaucet      = nv('b-faucet-price');
+  const eBasin = (() => {
+  const extra = clamp0(pBasin * numBaths - ALLOW_BASIN * numBaths);
+  el('basin-breakdown').innerHTML =
+    brow(`Builder allowance (₹${ALLOW_BASIN} × ${numBaths} bathrooms)`, ALLOW_BASIN * numBaths, 'allowance') +
+    (pBasin > 0 ? brow(`Your Wash Basin (₹${pBasin} × ${numBaths} bathrooms)`, pBasin * numBaths, '') : '') +
+    (pBasin > 0 ? brow('Wash Basin Additional Cost', extra, extra > 0 ? 'upgrade' : 'zero') : '');
+  return extra;
+})();
+  const eFaucet = (() => {
+  const extra = clamp0(totalFaucets * pFaucet - builderTaps * ALLOW_FAUCET);
+  el('faucet-breakdown').innerHTML =
+    brow(`Builder taps (2 × ${numBaths} bathrooms)`, builderTaps, 'allowance', 'sqft') +
+    brow(`Builder allowance (₹${ALLOW_FAUCET} × ${builderTaps} units)`, ALLOW_FAUCET * builderTaps, 'allowance') +
+    (pFaucet > 0 ? brow(`Your taps (${qFaucetPer} per bath × ${numBaths} baths = ${totalFaucets} units @ ₹${pFaucet})`, pFaucet * totalFaucets, '') : '') +
+    (pFaucet > 0 ? brow('Faucet Additional Cost', extra, extra > 0 ? 'upgrade' : 'zero') : '');
+  return extra;
+})();
 
-  const eCommode = fixtureBrow('commode-breakdown', qCommode, pCommode, ALLOW_COMMODE, 'Commode');
-  const eBasin   = fixtureBrow('basin-breakdown',   qBasin,   pBasin,   ALLOW_BASIN,   'Wash Basin');
-  const eShower  = fixtureBrow('shower-breakdown',  qShower,  pShower,  ALLOW_SHOWER,  'Shower');
-  const eFaucet  = fixtureBrow('faucet-breakdown',  qFaucet,  pFaucet,  ALLOW_FAUCET,  'Faucet');
+const wallArea = Math.round(4 * Math.sqrt(60) * 7 * numBaths);
+const pBathWall = nv('b-bath-wall-price');
+const eBathWall = (() => {
+  const extra = clamp0(pBathWall - ALLOW_BATH_WAL) * wallArea;
+  el('bath-wall-breakdown').innerHTML =
+    brow(`Wall area (4 × √60 × 7ft × ${numBaths} baths)`, wallArea, 'allowance', 'sqft') +
+    brow(`Builder allowance (₹${ALLOW_BATH_WAL}/sq.ft × ${wallArea} sq.ft)`, ALLOW_BATH_WAL * wallArea, 'allowance') +
+    (pBathWall > 0 ? brow(`Your tiles (₹${pBathWall}/sq.ft × ${wallArea} sq.ft)`, pBathWall * wallArea, '') : '') +
+    (pBathWall > 0 ? brow('Wall Tile Additional Cost', extra, extra > 0 ? 'upgrade' : 'zero') : '');
+  return extra;
+})();
 
-  BATHROOM_TOTAL = eCommode + eBasin + eShower + eFaucet;
+  BATHROOM_TOTAL = eBasin + eFaucet + eBathWall;
   el('bathroom-total-val').textContent = fmt(BATHROOM_TOTAL);
 }
 
@@ -374,8 +398,10 @@ function computeAllowances() {
   const kitchenAllow = ALLOW_COUNTER * nv('k-counter-area') + ALLOW_SINK + ALLOW_UTILITY;
 
   // Bathroom allowances
-  const bathAllow = ALLOW_COMMODE * nv('b-commode-qty') + ALLOW_BASIN * nv('b-basin-qty') +
-                    ALLOW_SHOWER  * nv('b-shower-qty')  + ALLOW_FAUCET * nv('b-faucet-qty');
+  const wallArea   = Math.round(4 * Math.sqrt(60) * 7 * numBaths);
+  const bathAllow  = ALLOW_BASIN * numBaths + 
+                    ALLOW_FAUCET * (2 * numBaths) + 
+                    ALLOW_BATH_WAL * wallArea;
 
   // Doors allowances
   const doorsAllow = ALLOW_MAIN_DOOR * nv('d-main-qty') +

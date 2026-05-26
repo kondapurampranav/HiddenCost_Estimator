@@ -178,14 +178,12 @@
         <!-- Balcony Flooring -->
         <div class="card">
           <div class="card-title">Balcony Flooring</div>
-          <span class="allowance-tag">✦ Builder Allowance: ₹125 / sq.ft</span>
+          <span class="allowance-tag">✦ Builder Allowance: ₹60 / sq.ft</span>
           <div class="grid-2" style="gap:16px">
             <div class="field">
               <label>Material Type</label>
-              <select id="t-balcony-type" onchange="calcTiles()">
-                <option value="Tiles">Tiles</option>
-                <option value="Granite">Granite</option>
-              </select>
+                <input type="text" value="Anti-Skid Tiles" readonly>
+              
             </div>
             <div class="field">
               <label>Selected Price (₹/sq.ft)</label>
@@ -296,30 +294,24 @@
 
       <div class="section-gap">
 
+        <!-- Bathroom Wall Tiles -->
         <div class="card">
-          <div class="card-title">🚽 Commode</div>
-          <span class="allowance-tag">✦ Builder Allowance: ₹8,000 per unit</span>
+          <div class="card-title">🚿 Bathroom Wall Tiles</div>
+          <span class="allowance-tag">✦ Builder Allowance: ₹60 / sq.ft</span>
+          <div class="card-sub">Wall area is auto-calculated: 4 × √(60 sq.ft) × 7ft height × no. of bathrooms</div>
           <div class="grid-2" style="gap:16px">
             <div class="field">
-              <label>Number of Commodes</label>
-              <input type="number" id="b-commode-qty" placeholder="e.g. 2" min="0" oninput="calcBathroom()"/>
-            </div>
-            <div class="field">
-              <label>Selected Price per Unit (₹)</label>
-              <input type="number" id="b-commode-price" placeholder="e.g. 14000" min="0" oninput="calcBathroom()"/>
+              <label>Selected Tile Price (₹/sq.ft)</label>
+              <input type="number" id="b-bath-wall-price" placeholder="e.g. 85" min="0" oninput="calcBathroom()"/>
             </div>
           </div>
-          <div class="breakdown" id="commode-breakdown" style="margin-top:18px"></div>
+          <div class="breakdown" id="bath-wall-breakdown" style="margin-top:18px"></div>
         </div>
 
         <div class="card">
           <div class="card-title">🪥 Wash Basin</div>
-          <span class="allowance-tag">✦ Builder Allowance: ₹3,500 per unit</span>
+          <span class="allowance-tag">✦ Builder Allowance: ₹2,000 per unit</span>
           <div class="grid-2" style="gap:16px">
-            <div class="field">
-              <label>Number of Wash Basins</label>
-              <input type="number" id="b-basin-qty" placeholder="e.g. 2" min="0" oninput="calcBathroom()"/>
-            </div>
             <div class="field">
               <label>Selected Price per Unit (₹)</label>
               <input type="number" id="b-basin-price" placeholder="e.g. 6000" min="0" oninput="calcBathroom()"/>
@@ -329,33 +321,17 @@
         </div>
 
         <div class="card">
-          <div class="card-title">🚿 Shower</div>
-          <span class="allowance-tag">✦ Builder Allowance: ₹4,000 per unit</span>
-          <div class="grid-2" style="gap:16px">
-            <div class="field">
-              <label>Number of Showers</label>
-              <input type="number" id="b-shower-qty" placeholder="e.g. 2" min="0" oninput="calcBathroom()"/>
-            </div>
-            <div class="field">
-              <label>Selected Price per Unit (₹)</label>
-              <input type="number" id="b-shower-price" placeholder="e.g. 8000" min="0" oninput="calcBathroom()"/>
-            </div>
-          </div>
-          <div class="breakdown" id="shower-breakdown" style="margin-top:18px"></div>
-        </div>
-
-        <div class="card">
           <div class="card-title">🔩 Faucets &amp; Taps</div>
-          <span class="allowance-tag">✦ Builder Allowance: ₹1,500 per unit</span>
+          <span class="allowance-tag">✦ Builder Allowance: ₹1,200 per unit</span>
           <div class="grid-2" style="gap:16px">
             <div class="field">
-              <label>Number of Faucets</label>
-              <input type="number" id="b-faucet-qty" placeholder="e.g. 4" min="0" oninput="calcBathroom()"/>
+              <label>Number of Taps per Bathroom</label>
+              <input type="number" id="b-faucet-qty" placeholder="e.g. 3" min="0" oninput="calcBathroom()"/>
             </div>
             <div class="field">
-              <label>Selected Price per Unit (₹)</label>
-              <input type="number" id="b-faucet-price" placeholder="e.g. 3000" min="0" oninput="calcBathroom()"/>
-            </div>
+                <label>Selected Price per Unit (₹)</label>
+                <input type="number" id="b-faucet-price" placeholder="e.g. 3000" min="0" oninput="calcBathroom()"/>
+              </div>
           </div>
           <div class="breakdown" id="faucet-breakdown" style="margin-top:18px"></div>
         </div>
