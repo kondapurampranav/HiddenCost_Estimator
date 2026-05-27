@@ -82,7 +82,6 @@
     <button class="nav-tab active" data-page="tiles"     onclick="switchPage('tiles',this)">Tiles</button>
     <button class="nav-tab"        data-page="kitchen"   onclick="switchPage('kitchen',this)">Kitchen</button>
     <button class="nav-tab"        data-page="bathroom"  onclick="switchPage('bathroom',this)">Bathroom</button>
-    <button class="nav-tab"        data-page="doors"     onclick="switchPage('doors',this)">Doors &amp; Windows</button>
     <button class="nav-tab"        data-page="accessories" onclick="switchPage('accessories',this)">Accessories</button>
     <button class="nav-tab"        data-page="dashboard" onclick="switchPage('dashboard',this)">Dashboard</button>
     <button class="nav-tab nav-home" onclick="goHome()">← Home</button>
@@ -228,7 +227,7 @@
         <!-- Countertop -->
         <div class="card">
           <div class="card-title">🪨 Countertop</div>
-          <span class="allowance-tag">✦ Builder Allowance: Quartz ₹150 / sq.ft &nbsp;|&nbsp; Granite ₹180 / sq.ft</span>
+          <span class="allowance-tag">✦ Builder Allowance: ₹180 / sq.ft</span>
           <div class="grid-3" style="gap:16px">
             <div class="field">
               <label>Material Type</label>
@@ -347,73 +346,6 @@
     </div>
   </div>
 
-  <!-- ─────────────────── DOORS & WINDOWS PAGE ─────────────────── -->
-  <div id="page-doors" class="page hidden">
-    <div class="inner animate-in">
-      <div class="page-title">DOORS &amp; <span>WINDOWS</span></div>
-      <p class="page-sub">Enter your selected door and window costs to calculate the upgrade above builder allowances.</p>
-
-      <div class="section-gap">
-
-        <div class="card">
-          <div class="card-title">🚪 Main Door</div>
-          <span class="allowance-tag">✦ Builder Allowance: ₹25,000 per unit</span>
-          <div class="grid-2" style="gap:16px">
-            <div class="field">
-              <label>Number of Main Doors</label>
-              <input type="number" id="d-main-qty" placeholder="e.g. 1" min="0" oninput="calcDoors()"/>
-            </div>
-            <div class="field">
-              <label>Selected Price per Unit (₹)</label>
-              <input type="number" id="d-main-price" placeholder="e.g. 45000" min="0" oninput="calcDoors()"/>
-            </div>
-          </div>
-          <div class="breakdown" id="main-door-breakdown" style="margin-top:18px"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">🚪 Internal Doors</div>
-          <span class="allowance-tag">✦ Builder Allowance: ₹8,000 per unit</span>
-          <div class="grid-2" style="gap:16px">
-            <div class="field">
-              <label>Number of Internal Doors</label>
-              <input type="number" id="d-internal-qty" placeholder="e.g. 4" min="0" oninput="calcDoors()"/>
-            </div>
-            <div class="field">
-              <label>Selected Price per Unit (₹)</label>
-              <input type="number" id="d-internal-price" placeholder="e.g. 12000" min="0" oninput="calcDoors()"/>
-            </div>
-          </div>
-          <div class="breakdown" id="internal-door-breakdown" style="margin-top:18px"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">🪟 Windows</div>
-          <span class="allowance-tag">✦ Builder Allowance: ₹6,000 per unit</span>
-          <div class="grid-2" style="gap:16px">
-            <div class="field">
-              <label>Number of Windows</label>
-              <input type="number" id="d-window-qty" placeholder="e.g. 6" min="0" oninput="calcDoors()"/>
-            </div>
-            <div class="field">
-              <label>Selected Price per Unit (₹)</label>
-              <input type="number" id="d-window-price" placeholder="e.g. 10000" min="0" oninput="calcDoors()"/>
-            </div>
-          </div>
-          <div class="breakdown" id="window-breakdown" style="margin-top:18px"></div>
-        </div>
-
-        <!-- Doors Total -->
-        <div class="result-box">
-          <div class="result-label">TOTAL DOORS &amp; WINDOWS UPGRADE COST</div>
-          <div class="result-value" id="doors-total-val">₹0</div>
-          <div class="result-detail">Additional amount above builder package for doors and windows</div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
   <!-- ─────────────────── ACCESSORIES PAGE ─────────────────── -->
   <div id="page-accessories" class="page hidden">
     <div class="inner animate-in">
@@ -525,7 +457,7 @@
         </div>
 
         <!-- Charts -->
-        <div class="grid-2-charts" style="gap:20px">
+        <div class="grid-2-charts" style="gap:20px" id="charts-grid">
           <div class="chart-box">
             <div class="chart-title">UPGRADE COST DISTRIBUTION</div>
             <canvas id="chart-pie"></canvas>
@@ -534,11 +466,6 @@
             <div class="chart-title">BUILDER ALLOWANCE VS YOUR SELECTION</div>
             <canvas id="chart-compare"></canvas>
           </div>
-        </div>
-
-        <div class="chart-box">
-          <div class="chart-title">ALLOWANCE VS UPGRADE — BY CATEGORY</div>
-          <canvas id="chart-bar"></canvas>
         </div>
 
         <!-- Insight -->

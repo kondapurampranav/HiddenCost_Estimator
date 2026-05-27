@@ -53,7 +53,6 @@ function startApp() {
   calcTiles();
   calcKitchen();
   calcBathroom();
-  calcDoors();
   calcAccessories();
 }
 
@@ -63,7 +62,7 @@ function goHome() {
 }
 
 function switchPage(pageId, btn) {
-  const pageIds = ['tiles', 'kitchen', 'bathroom', 'doors', 'accessories', 'dashboard'];
+  const pageIds = ['tiles', 'kitchen', 'bathroom', 'accessories', 'dashboard'];
   pageIds.forEach(id => {
     el('page-' + id).classList.add('hidden');
     el('page-' + id).classList.remove('active');
@@ -112,7 +111,6 @@ function calcHomeArea() {
     calcTiles();
     calcKitchen();
     calcBathroom();
-    calcDoors();
     calcAccessories();
   }
 }
@@ -192,7 +190,7 @@ const hallExtra = clamp0(hallPrice - hallAllow) * hallArea;
 // ──────────────────────────────────────────────────────────────────
 // MODULE 2 — KITCHEN
 // ──────────────────────────────────────────────────────────────────
-const ALLOW_COUNTER = 150;
+const ALLOW_COUNTER = 180;
 const ALLOW_COUNTER_GRANITE = 180;
 const ALLOW_SINK    = 7000;
 const ALLOW_UTILITY = 3000;
@@ -293,33 +291,6 @@ const eBathWall = (() => {
 }
 
 // ──────────────────────────────────────────────────────────────────
-// MODULE 4 — DOORS & WINDOWS
-// ──────────────────────────────────────────────────────────────────
-const ALLOW_MAIN_DOOR     = 25000;
-const ALLOW_INTERNAL_DOOR = 8000;
-const ALLOW_WINDOW        = 6000;
-
-let DOORS_TOTAL = 0;
-
-function calcDoors() {
-  function doorBrow(elId, qty, price, allowance, label) {
-    const extra = clamp0(price - allowance) * qty;
-    el(elId).innerHTML =
-      brow(`Builder allowance (₹${allowance.toLocaleString('en-IN')} × ${qty} units)`, allowance * qty, 'allowance') +
-      (price > 0 ? brow(`Your ${label} (₹${price.toLocaleString('en-IN')} × ${qty} units)`, price * qty, '') : '') +
-      (price > 0 ? brow(`${label} Additional Cost`, extra, extra > 0 ? 'upgrade' : 'zero') : '');
-    return extra;
-  }
-
-  const eMain   = doorBrow('main-door-breakdown',     nv('d-main-qty'),     nv('d-main-price'),     ALLOW_MAIN_DOOR,     'Main Door');
-  const eInt    = doorBrow('internal-door-breakdown',  nv('d-internal-qty'), nv('d-internal-price'), ALLOW_INTERNAL_DOOR, 'Internal Door');
-  const eWindow = doorBrow('window-breakdown',          nv('d-window-qty'),   nv('d-window-price'),   ALLOW_WINDOW,        'Window');
-
-  DOORS_TOTAL = eMain + eInt + eWindow;
-  el('doors-total-val').textContent = fmt(DOORS_TOTAL);
-}
-
-// ──────────────────────────────────────────────────────────────────
 // MODULE 5 — ACCESSORIES
 // ──────────────────────────────────────────────────────────────────
 const ALLOW_HANDLE = 500;
@@ -356,12 +327,11 @@ function calcAccessories() {
 // DASHBOARD
 // ──────────────────────────────────────────────────────────────────
 const DASH_COLORS = ['#E8A838', '#2DD4BF', '#F87171', '#818CF8', '#34D399'];
-let pieChart = null, compareChart = null, barChart = null;
+let pieChart = null, compareChart = null;
 
 function destroyCharts() {
   if (pieChart)    { pieChart.destroy();    pieChart    = null; }
   if (compareChart){ compareChart.destroy(); compareChart = null; }
-  if (barChart)    { barChart.destroy();    barChart    = null; }
 }
 
 const chartDefaults = {
@@ -403,26 +373,20 @@ function computeAllowances() {
                     ALLOW_FAUCET * (2 * numBaths) + 
                     ALLOW_BATH_WAL * wallArea;
 
-  // Doors allowances
-  const doorsAllow = ALLOW_MAIN_DOOR * nv('d-main-qty') +
-                     ALLOW_INTERNAL_DOOR * nv('d-internal-qty') +
-                     ALLOW_WINDOW * nv('d-window-qty');
-
   // Accessories allowances
   const accAllow = ALLOW_HANDLE * nv('a-handle-qty') + ALLOW_LOCK * nv('a-lock-qty');
 
-  return { tilesAllow, kitchenAllow, bathAllow, doorsAllow, accAllow };
-}
+  return { tilesAllow, kitchenAllow, bathAllow, accAllow };}
 
 function renderDashboard() {
   const gridColor = 'rgba(42,45,62,0.8)';
-  const categories = ['Tiles & Flooring', 'Kitchen', 'Bathroom', 'Doors & Windows', 'Accessories'];
-  const upgrades   = [TILE_TOTAL, KITCHEN_TOTAL, BATHROOM_TOTAL, DOORS_TOTAL, ACC_TOTAL];
+  const categories = ['Tiles & Flooring', 'Kitchen', 'Bathroom', 'Accessories'];
+  const upgrades   = [TILE_TOTAL, KITCHEN_TOTAL, BATHROOM_TOTAL, ACC_TOTAL];
   const catColors  = DASH_COLORS;
-  const catBoxColors = ['gold', 'teal', 'red', 'indigo', 'green'];
+  const catBoxColors = ['gold', 'teal', 'red', 'green'];
 
   const allow = computeAllowances();
-  const allowances = [allow.tilesAllow, allow.kitchenAllow, allow.bathAllow, allow.doorsAllow, allow.accAllow];
+  const allowances = [allow.tilesAllow, allow.kitchenAllow, allow.bathAllow, allow.accAllow];
 
   const totalUpgrade   = upgrades.reduce((a, b) => a + b, 0);
   const totalAllowance = TOTAL_AREA * 2350
@@ -477,7 +441,14 @@ function renderDashboard() {
     `).join('');
 
   // Charts
-  destroyCharts();
+  // Charts
+destroyCharts();
+
+if (totalUpgrade === 0) {
+  el('charts-grid').classList.add('hidden');
+} else {
+  el('charts-grid').classList.remove('hidden');
+};
 
   // ── DOUGHNUT — upgrade distribution
   const nonZeroUpgrades = upgrades.map(u => Math.max(0, Math.round(u)));
@@ -521,26 +492,6 @@ function renderDashboard() {
     }
   });
 
-  // ── STACKED BAR — allowance vs upgrade per category
-  barChart = new Chart(el('chart-bar'), {
-    type: 'bar',
-    data: {
-      labels: categories,
-      datasets: [
-        { label: 'Builder Allowance', data: allowances.map(v => Math.round(v)), backgroundColor: '#2DD4BF', borderRadius: 4, stack: 'a' },
-        { label: 'Your Upgrade',      data: upgrades.map(v => Math.round(v)),   backgroundColor: '#FB923C', borderRadius: 4, stack: 'a' }
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      scales: {
-        x: { ticks: { color: '#6B7080' }, grid: { color: gridColor }, stacked: true },
-        y: { ticks: { color: '#6B7080', callback: v => '₹' + (v / 1000).toFixed(0) + 'K' }, grid: { color: gridColor }, stacked: true }
-      },
-      plugins: { ...chartDefaults.plugins }
-    }
-  });
-
   // ── Insight text
   const topIdx  = upgrades.indexOf(Math.max(...upgrades));
   const topCat  = categories[topIdx];
@@ -576,15 +527,13 @@ function generatePDF() {
     const tilesCost = TILE_TOTAL;
     const kitchenCost = KITCHEN_TOTAL;
     const bathroomCost = BATHROOM_TOTAL;
-    const doorsCost = DOORS_TOTAL;
     const accessoriesCost = ACC_TOTAL;
 
     const totalUpgrade =
-        tilesCost +
-        kitchenCost +
-        bathroomCost +
-        doorsCost +
-        accessoriesCost;
+                        tilesCost +
+                        kitchenCost +
+                        bathroomCost +
+                        accessoriesCost;
     const finalCost = packageCost + totalUpgrade;
 
     // ===== PDF DESIGN =====
@@ -632,9 +581,6 @@ function generatePDF() {
     y += 8;
     doc.text("Bathroom", 20, y);
     doc.text(`Rs.${bathroomCost.toLocaleString("en-IN")}`, 120, y);
-    y += 8;
-    doc.text("Doors", 20, y);
-    doc.text(`Rs.${doorsCost.toLocaleString("en-IN")}`, 120, y);
     y += 8;
     doc.text("Accessories", 20, y);
     doc.text(`Rs.${accessoriesCost.toLocaleString("en-IN")}`, 120, y);
