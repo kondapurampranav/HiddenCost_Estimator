@@ -299,27 +299,13 @@ const ALLOW_LOCK   = 1200;
 let ACC_TOTAL = 0;
 
 function calcAccessories() {
-  const qHandle = nv('a-handle-qty'); const pHandle = nv('a-handle-price');
-  const qLock   = nv('a-lock-qty');   const pLock   = nv('a-lock-price');
   const otherCost = nv('a-other-cost');
   const otherDesc = sv('a-other-desc', 'Other accessories');
-
-  const eHandle = clamp0(pHandle - ALLOW_HANDLE) * qHandle;
-  el('handle-breakdown').innerHTML =
-    brow(`Builder allowance (₹${ALLOW_HANDLE} × ${qHandle} units)`, ALLOW_HANDLE * qHandle, 'allowance') +
-    (pHandle > 0 ? brow(`Your handles (₹${pHandle.toLocaleString('en-IN')} × ${qHandle} units)`, pHandle * qHandle, '') : '') +
-    (pHandle > 0 ? brow('Handle Additional Cost', eHandle, eHandle > 0 ? 'upgrade' : 'zero') : '');
-
-  const eLock = clamp0(pLock - ALLOW_LOCK) * qLock;
-  el('lock-breakdown').innerHTML =
-    brow(`Builder allowance (₹${ALLOW_LOCK} × ${qLock} units)`, ALLOW_LOCK * qLock, 'allowance') +
-    (pLock > 0 ? brow(`Your locks (₹${pLock.toLocaleString('en-IN')} × ${qLock} units)`, pLock * qLock, '') : '') +
-    (pLock > 0 ? brow('Lock Additional Cost', eLock, eLock > 0 ? 'upgrade' : 'zero') : '');
 
   el('other-acc-breakdown').innerHTML =
     (otherCost > 0 ? brow(otherDesc, otherCost, 'upgrade') : brow('No other accessories entered', 0, ''));
 
-  ACC_TOTAL = eHandle + eLock + otherCost;
+  ACC_TOTAL = otherCost;
   el('accessories-total-val').textContent = fmt(ACC_TOTAL);
 }
 
@@ -374,8 +360,7 @@ function computeAllowances() {
                     ALLOW_BATH_WAL * wallArea;
 
   // Accessories allowances
-  const accAllow = ALLOW_HANDLE * nv('a-handle-qty') + ALLOW_LOCK * nv('a-lock-qty');
-
+  const accAllow = 0;
   return { tilesAllow, kitchenAllow, bathAllow, accAllow };}
 
 function renderDashboard() {
