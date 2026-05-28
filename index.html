@@ -14,10 +14,10 @@
 
 <!-- ═══════════════════════════ HOME PAGE ═══════════════════════════ -->
 <div id="page-home" class="page active">
-  <div class="hero-eyebrow">🏗 MATERIAL UPGRADE COST ESTIMATOR — V2</div>
+  <div class="hero-eyebrow">SMART HIDDEN CONSTRUCTION COST ESTIMATOR</div>
 
   <h1 class="hero">
-    KNOW YOUR<br><span>UPGRADE</span><br>COST UPFRONT
+    KNOW YOUR<br><span>HIDDEN(UPGRADE)</span><br>COST UPFRONT
   </h1>
 
   <p class="hero-sub">
@@ -27,7 +27,7 @@
 
   <!-- House dimension inputs right on hero -->
   <div class="hero-inputs">
-    <div class="hero-inputs-title">📐 Enter House Dimensions</div>
+    <div class="hero-inputs-title">Enter House Dimensions</div>
     <div class="grid-2" style="gap:16px">
       <div class="field">
         <label>Length (ft)</label>
@@ -66,7 +66,7 @@
 
   <div class="hero-steps">
     <div class="hero-step"><div class="hero-step-num">01</div><div class="hero-step-label">Enter House Dimensions</div></div>
-    <div class="hero-step"><div class="hero-step-num">02</div><div class="hero-step-label">Configure 5 Material Modules</div></div>
+    <div class="hero-step"><div class="hero-step-num">02</div><div class="hero-step-label">Configure Material Modules</div></div>
     <div class="hero-step"><div class="hero-step-num">03</div><div class="hero-step-label">View Upgrade Cost Dashboard</div></div>
   </div>
 
@@ -78,11 +78,11 @@
 <!-- ═══════════════════════════ APP SHELL ═══════════════════════════ -->
 <div id="app-shell" class="hidden">
   <nav>
-    <div class="nav-logo">BUILDTRUE <span>V2</span></div>
-    <button class="nav-tab active" data-page="tiles"     onclick="switchPage('tiles',this)">Tiles</button>
+    <div class="nav-logo">BUILDTRUE</div>
+    <button class="nav-tab active" data-page="tiles"     onclick="switchPage('tiles',this)">Flooring</button>
     <button class="nav-tab"        data-page="kitchen"   onclick="switchPage('kitchen',this)">Kitchen</button>
     <button class="nav-tab"        data-page="bathroom"  onclick="switchPage('bathroom',this)">Bathroom</button>
-    <button class="nav-tab"        data-page="accessories" onclick="switchPage('accessories',this)">Accessories</button>
+    <button class="nav-tab"        data-page="accessories" onclick="switchPage('accessories',this)">Other Accessories</button>
     <button class="nav-tab"        data-page="dashboard" onclick="switchPage('dashboard',this)">Dashboard</button>
     <button class="nav-tab nav-home" onclick="goHome()">← Home</button>
   </nav>
@@ -97,7 +97,7 @@
 
         <!-- Area Inputs -->
         <div class="card">
-          <div class="card-title">📐 Area Breakdown</div>
+          <div class="card-title">Area Breakdown</div>
           <div class="card-sub">Enter kitchen and balcony areas — remaining area auto-assigned to Hall + Rooms.</div>
           <div class="grid-3" style="gap:16px">
             <div class="field">
@@ -226,7 +226,7 @@
 
         <!-- Countertop -->
         <div class="card">
-          <div class="card-title">🪨 Countertop</div>
+          <div class="card-title">Countertop</div>
           <span class="allowance-tag">✦ Builder Allowance: ₹180 / sq.ft</span>
           <div class="grid-3" style="gap:16px">
             <div class="field">
@@ -250,7 +250,7 @@
 
         <!-- Kitchen Sink -->
         <div class="card">
-          <div class="card-title">🚰 Kitchen Sink</div>
+          <div class="card-title">Kitchen Sink</div>
           <span class="allowance-tag">✦ Builder Allowance: ₹7,000</span>
           <div class="grid-2" style="gap:16px">
             <div class="field">
@@ -263,7 +263,7 @@
 
         <!-- Utility Sink & Faucet -->
         <div class="card">
-          <div class="card-title">🔧 Utility Sink &amp; Faucet</div>
+          <div class="card-title">Utility Sink &amp; Faucet</div>
           <span class="allowance-tag">✦ Builder Allowance: ₹3,000</span>
           <div class="grid-2" style="gap:16px">
             <div class="field">
@@ -295,7 +295,7 @@
 
         <!-- Bathroom Wall Tiles -->
         <div class="card">
-          <div class="card-title">🚿 Bathroom Wall Tiles</div>
+          <div class="card-title">Bathroom Wall Tiles</div>
           <span class="allowance-tag">✦ Builder Allowance: ₹60 / sq.ft</span>
           <div class="card-sub">Wall area is auto-calculated: 4 × √(60 sq.ft) × 7ft height × no. of bathrooms</div>
           <div class="grid-2" style="gap:16px">
@@ -308,7 +308,7 @@
         </div>
 
         <div class="card">
-          <div class="card-title">🪥 Wash Basin</div>
+          <div class="card-title">Wash Basin</div>
           <span class="allowance-tag">✦ Builder Allowance: ₹2,000 per unit</span>
           <div class="grid-2" style="gap:16px">
             <div class="field">
@@ -320,7 +320,7 @@
         </div>
 
         <div class="card">
-          <div class="card-title">🔩 Faucets &amp; Taps</div>
+          <div class="card-title">Faucets &amp; Taps</div>
           <span class="allowance-tag">✦ Builder Allowance: ₹1,200 per unit</span>
           <div class="grid-2" style="gap:16px">
             <div class="field">
@@ -349,13 +349,13 @@
   <!-- ─────────────────── ACCESSORIES PAGE ─────────────────── -->
   <div id="page-accessories" class="page hidden">
     <div class="inner animate-in">
-      <div class="page-title">ACCESSORIES &amp; <span>HARDWARE</span></div>
+      <div class="page-title">OTHER ACCESSORIES &amp; <span>HARDWARE</span></div>
       <p class="page-sub">Enter your selected accessory costs to calculate the upgrade above builder allowances.</p>
 
       <div class="section-gap">
 
         <div class="card">
-          <div class="card-title">✨ Other Accessories</div>
+          <div class="card-title">Other Accessories</div>
           <span class="allowance-tag">✦ Builder Allowance: ₹0 (not included in package)</span>
           <div class="card-sub">Towel rails, hooks, hinges, cabinet handles, etc.</div>
           <div class="grid-2" style="gap:16px">
