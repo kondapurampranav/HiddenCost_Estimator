@@ -9,7 +9,7 @@
 // GLOBAL STATE
 // ──────────────────────────────────────────────────────────────────
 let TOTAL_AREA = 0; // sq.ft — set on home page, used by all modules
-
+const rate = 2350;
 // ──────────────────────────────────────────────────────────────────
 // HELPERS
 // ──────────────────────────────────────────────────────────────────
@@ -94,7 +94,7 @@ function calcHomeArea() {
 
   if (area > 0) {
     el('home-area-val').textContent = fmtN(area) + ' sq.ft';
-    el('home-builder-val').textContent = fmt(area * 2350);
+    el('home-builder-val').textContent = fmt(area * rate);
     el('home-area-sub').textContent =
       `${length} ft × ${breadth} ft × ${floors} floor(s) = ${fmtN(area)} sq.ft`;
     resultBox.classList.remove('hidden');
@@ -116,13 +116,13 @@ function calcHomeArea() {
 }
 
 // ──────────────────────────────────────────────────────────────────
-// MODULE 1 — TILES
+// MODULE 1 — FLOORING
 // ──────────────────────────────────────────────────────────────────
 // Allowances
 const ALLOW_HALL = 125;
-const ALLOW_HALL_GRANITE = 125;
+const ALLOW_HALL_GRANITE = 180;
 const ALLOW_KITCHEN  = 125;
-const ALLOW_KITCHEN_GRANITE = 125;
+const ALLOW_KITCHEN_GRANITE = 180;
 const ALLOW_BALCONY  = 60;
 const ALLOW_BATH_WAL = 60;
 const BATH_AREA_PER  = 60; // sq.ft per bathroom
@@ -501,86 +501,170 @@ window.addEventListener('DOMContentLoaded', () => {
   calcAccessories();
 });
 
+// -----------------------------------------------------------------------
+// GENERATE PDF
+// -----------------------------------------------------------------------
+
+
 function generatePDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
 
-    // ===== DATA =====
-    const today = new Date().toLocaleDateString("en-IN");
-    const builderRate = 2350; // change if needed
-    const packageCost = TOTAL_AREA * builderRate;
-    const tilesCost = TILE_TOTAL;
-    const kitchenCost = KITCHEN_TOTAL;
-    const bathroomCost = BATHROOM_TOTAL;
-    const accessoriesCost = ACC_TOTAL;
+  // ===== DATA =====
+  const today = new Date().toLocaleDateString("en-IN", { day:'2-digit', month:'long', year:'numeric' });
+  const builderRate = 2350;
+  const packageCost = TOTAL_AREA * builderRate;
+  const tilesCost = TILE_TOTAL;
+  const kitchenCost = KITCHEN_TOTAL;
+  const bathroomCost = BATHROOM_TOTAL;
+  const accessoriesCost = ACC_TOTAL;
+  const totalUpgrade = tilesCost + kitchenCost + bathroomCost + accessoriesCost;
+  const finalCost = packageCost + totalUpgrade;
 
-    const totalUpgrade =
-                        tilesCost +
-                        kitchenCost +
-                        bathroomCost +
-                        accessoriesCost;
-    const finalCost = packageCost + totalUpgrade;
+  const inr = n => 'Rs.' + Math.round(n).toLocaleString('en-IN');
 
-    // ===== PDF DESIGN =====
-    let y = 20;
-    doc.setFontSize(22);
-    doc.setFont("helvetica", "bold");
-    doc.text("BUILDTRUE", 20, y);
-    y += 10;
-    doc.setFontSize(14);
+  let y = 0;
+
+  // ===== HEADER BAND =====
+  doc.setFillColor(20, 21, 28);
+  doc.rect(0, 0, pageWidth, 38, 'F');
+
+  doc.setTextColor(232, 168, 56);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.text("HIDDEN COST ESTIMATOR", 14, 16);
+
+  doc.setTextColor(180, 180, 190);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text("Construction Material Upgrade Cost Report", 14, 24);
+
+  doc.setTextColor(100, 100, 110);
+  doc.setFontSize(8);
+  doc.text(`Generated on ${today}`, 14, 32);
+
+  // right side — final cost
+  doc.setTextColor(232, 168, 56);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text("FINAL COST", pageWidth - 14, 16, { align: 'right' });
+  doc.setFontSize(16);
+  doc.text(inr(finalCost), pageWidth - 14, 26, { align: 'right' });
+
+  y = 48;
+
+  // ===== HOUSE DETAILS SECTION =====
+  // section title
+  doc.setFillColor(232, 168, 56, 0.15);
+  doc.setFillColor(40, 38, 20);
+  doc.rect(14, y - 5, pageWidth - 28, 10, 'F');
+  doc.setTextColor(232, 168, 56);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text("HOUSE DETAILS", 17, y + 2);
+  y += 12;
+
+  // rows
+  const detailRows = [
+    ['Total Area', `${TOTAL_AREA} sq.ft`],
+    ['Builder Rate', `Rs.${builderRate} / sq.ft`],
+    ['Builder Package Cost', inr(packageCost)],
+  ];
+
+  detailRows.forEach(([label, val], i) => {
+    if (i % 2 === 0) {
+      doc.setFillColor(245, 245, 248);
+      doc.rect(14, y - 4, pageWidth - 28, 9, 'F');
+    }
+    doc.setTextColor(80, 80, 90);
     doc.setFont("helvetica", "normal");
-    doc.text("Construction Material Upgrade Report", 20, y);
+    doc.setFontSize(10);
+    doc.text(label, 18, y + 2);
+    doc.setTextColor(30, 30, 40);
+    doc.setFont("helvetica", "bold");
+    doc.text(val, pageWidth - 18, y + 2, { align: 'right' });
     y += 10;
-    doc.text(`Date: ${today}`, 20, y);
-    y += 10;
-    doc.line(20, y, 190, y);
+  });
 
-    // ===== HOUSE DETAILS =====
-    y += 10;
-    doc.setFont("helvetica", "bold");
-    doc.text("HOUSE DETAILS", 20, y);
-    y += 10;
-    doc.setFont("helvetica", "normal");
-    doc.text(`Area`, 20, y);
-    doc.text(`${TOTAL_AREA} sq.ft`, 120, y);
-    y += 8;
-    doc.text(`Builder Rate`, 20, y);
-    doc.text(`Rs.${builderRate}/sq.ft`, 120, y);
-    y += 8;
-    doc.text(`Package Cost`, 20, y);
-    doc.text(`Rs.${packageCost.toLocaleString("en-IN")}`, 120, y);
-    y += 10;
-    doc.line(20, y, 190, y);
+  y += 8;
 
-    // ===== UPGRADE SUMMARY =====
-    y += 10;
-    doc.setFont("helvetica", "bold");
-    doc.text("UPGRADE SUMMARY", 20, y);
-    y += 10;
+  // ===== UPGRADE SUMMARY SECTION =====
+  doc.setFillColor(40, 38, 20);
+  doc.rect(14, y - 5, pageWidth - 28, 10, 'F');
+  doc.setTextColor(232, 168, 56);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text("UPGRADE SUMMARY", 17, y + 2);
+  y += 12;
+
+  const upgradeRows = [
+    ['Tiles & Flooring', tilesCost],
+    ['Kitchen', kitchenCost],
+    ['Bathroom', bathroomCost],
+    ['Accessories', accessoriesCost],
+  ];
+
+  upgradeRows.forEach(([label, val], i) => {
+    if (i % 2 === 0) {
+      doc.setFillColor(245, 245, 248);
+      doc.rect(14, y - 4, pageWidth - 28, 9, 'F');
+    }
+    doc.setTextColor(80, 80, 90);
     doc.setFont("helvetica", "normal");
-    doc.text("Tiles", 20, y);
-    doc.text(`Rs.${tilesCost.toLocaleString("en-IN")}`, 120, y);
-    y += 8;
-    doc.text("Kitchen", 20, y);
-    doc.text(`Rs.${kitchenCost.toLocaleString("en-IN")}`, 120, y);
-    y += 8;
-    doc.text("Bathroom", 20, y);
-    doc.text(`Rs.${bathroomCost.toLocaleString("en-IN")}`, 120, y);
-    y += 8;
-    doc.text("Accessories", 20, y);
-    doc.text(`Rs.${accessoriesCost.toLocaleString("en-IN")}`, 120, y);
-    y += 10;
-    doc.line(20, y, 190, y);
-    // ===== FINAL TOTALS =====
-    y += 10;
+    doc.setFontSize(10);
+    doc.text(label, 18, y + 2);
+    const color = val > 0 ? [200, 80, 40] : [40, 160, 100];
+    doc.setTextColor(...color);
     doc.setFont("helvetica", "bold");
-    doc.text("TOTAL UPGRADE", 20, y);
-    doc.text(`Rs.${totalUpgrade.toLocaleString("en-IN")}`, 120, y);
+    doc.text(inr(val), pageWidth - 18, y + 2, { align: 'right' });
     y += 10;
-    doc.text("FINAL COST", 20, y);
-    doc.text(`Rs.${finalCost.toLocaleString("en-IN")}`, 120, y);
+  });
+
+  y += 8;
+
+  // ===== TOTALS SECTION =====
+  doc.setFillColor(40, 38, 20);
+  doc.rect(14, y - 5, pageWidth - 28, 10, 'F');
+  doc.setTextColor(232, 168, 56);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text("TOTALS", 17, y + 2);
+  y += 12;
+
+  const totalRows = [
+    ['Total Upgrade Cost', inr(totalUpgrade), [200, 80, 40]],
+    ['Builder Package Cost', inr(packageCost), [40, 100, 180]],
+    ['Final Cost (Package + Upgrade)', inr(finalCost), [20, 160, 100]],
+  ];
+
+  totalRows.forEach(([label, val, color], i) => {
+    if (i % 2 === 0) {
+      doc.setFillColor(245, 245, 248);
+      doc.rect(14, y - 4, pageWidth - 28, 9, 'F');
+    }
+    doc.setTextColor(80, 80, 90);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(label, 18, y + 2);
+    doc.setTextColor(...color);
+    doc.setFont("helvetica", "bold");
+    doc.text(val, pageWidth - 18, y + 2, { align: 'right' });
     y += 10;
-    doc.line(20, y, 190, y);
-    // ===== SAVE =====
-    doc.save("BuildTrue_Estimate_Report.pdf");
+  });
+
+  y += 10;
+
+  // ===== FOOTER =====
+  doc.setDrawColor(200, 200, 210);
+  doc.line(14, y, pageWidth - 14, y);
+  y += 6;
+  doc.setTextColor(150, 150, 160);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.text("This estimate is generated by BuildTrue — Smart Hidden Construction Cost Estimator.", pageWidth / 2, y, { align: 'center' });
+  doc.text("Costs are indicative and may vary based on final material selection and contractor.", pageWidth / 2, y + 5, { align: 'center' });
+
+  // ===== SAVE =====
+  doc.save("BuildTrue_Estimate_Report.pdf");
 }
