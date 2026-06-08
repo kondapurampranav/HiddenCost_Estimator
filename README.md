@@ -18,7 +18,6 @@ This project estimates those hidden upgrade costs and provides a detailed breakd
 - PDF Report Generation
 
 ## Technologies Used
-
 - HTML5
 - CSS3
 - JavaScript (ES6)
