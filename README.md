@@ -1,4 +1,4 @@
-> LIVE LINK https://kondapurampranav.github.io/HiddenCost_Estimator/
+> LIVE LINK - https://kondapurampranav.github.io/HiddenCost_Estimator/
 
 # Hidden-Cost-Estimator
 A web-based construction cost estimation tool that helps homeowners calculate the additional cost of material upgrades beyond the builder's standard package.
