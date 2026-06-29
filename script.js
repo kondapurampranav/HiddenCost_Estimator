@@ -267,7 +267,7 @@ function calcBathroom() {
   const eFaucet = (() => {
   const extra = clamp0(totalFaucets * pFaucet - builderTaps * ALLOW_FAUCET);
   el('faucet-breakdown').innerHTML =
-    brow(`Builder taps (2 × ${numBaths} bathrooms)`, builderTaps, 'allowance', 'sqft') +
+    brow(`Builder taps (2 × ${numBaths} bathrooms)`, builderTaps, 'allowance') +
     brow(`Builder allowance (₹${ALLOW_FAUCET} × ${builderTaps} units)`, ALLOW_FAUCET * builderTaps, 'allowance') +
     (pFaucet > 0 ? brow(`Your taps (${qFaucetPer} per bath × ${numBaths} baths = ${totalFaucets} units @ ₹${pFaucet})`, pFaucet * totalFaucets, '') : '') +
     (pFaucet > 0 ? brow('Faucet Additional Cost', extra, extra > 0 ? 'upgrade' : 'zero') : '');
